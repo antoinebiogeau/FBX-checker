@@ -37,11 +37,11 @@ def run_qa():
             errs = []
             bpy.context.view_layer.objects.active = obj
             
-            # --- CALCUL DES BORNES ---
+            # boundingbox
             world_verts = [obj.matrix_world @ v.co for v in obj.data.vertices]
             z_min, z_max = min([v.z for v in world_verts]), max([v.z for v in world_verts])
             
-            # --- 1. PIVOT (SCAN & FIX) ---
+            # pivot
             if settings.get('check_pivot'):
                 # Cible du SCAN
                 scan_target_z = z_min
@@ -51,7 +51,7 @@ def run_qa():
                 # On vérifie si le pivot actuel correspond à la cible du SCAN
                 if abs(obj.location.z - scan_target_z) > 0.001 or abs(obj.location.x) > 0.001:
                     if fix_active and settings.get('fix_pivot'):
-                        # LOGIQUE DE FIX
+                        # fix
                         bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
                         bpy.ops.object.mode_set(mode='EDIT')
                         bpy.ops.mesh.select_all(action='SELECT')
@@ -69,7 +69,7 @@ def run_qa():
                     else:
                         errs.append(f"Pivot incorrect (attendu: {{scan_p_mode}})")
 
-            # --- 2. NGONS (SCAN & FIX) ---
+            # -Ngon patch
             has_ngons = any(len(p.vertices) > 4 for p in obj.data.polygons)
             if settings.get('check_ngon') and has_ngons:
                 if fix_active and settings.get('fix_ngon'):
@@ -81,7 +81,7 @@ def run_qa():
                 else:
                     errs.append("NGons détectés")
 
-            # --- 3. MERGE DOUBLES (FIX UNIQUEMENT) ---
+            # merge double vertices
             if fix_active and settings.get('fix_double'):
                 bpy.ops.object.mode_set(mode='EDIT')
                 bpy.ops.mesh.select_all(action='SELECT')
@@ -91,14 +91,14 @@ def run_qa():
                 if len(obj.data.vertices) < pre_count:
                     modified = True
 
-            # --- 4. POLYCOUNT (SCAN) ---
+            # polycount
             if settings.get('check_poly'):
                 if len(obj.data.polygons) > settings.get('poly_limit', 10000):
                     errs.append(f"Polycount: {{len(obj.data.polygons)}}")
 
             results.append({{"name": obj.name, "status": "Pass" if not errs else "Fail", "errors": errs}})
 
-        # --- COLLISION UCX ---
+        # UCX
         if settings.get('check_ucx'):
             for o in [obj for obj in all_objs if obj.name.startswith('UCX_')]:
                 if o.name[4:] not in prop_names:

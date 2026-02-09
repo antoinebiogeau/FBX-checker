@@ -20,7 +20,6 @@ class CheckerWindow(QMainWindow):
         self.config = self.load_config()
         main_layout = QHBoxLayout()
 
-        # --- PANEL GAUCHE ---
         settings_panel = QVBoxLayout()
 
         # Configuration Blender
@@ -36,7 +35,7 @@ class CheckerWindow(QMainWindow):
         path_group.setLayout(path_layout)
         settings_panel.addWidget(path_group)
 
-        # 1. VALIDATION (SCAN)
+        # 1. scan
         val_group = QGroupBox("Validation (SCAN)")
         val_layout = QVBoxLayout()
 
@@ -67,7 +66,7 @@ class CheckerWindow(QMainWindow):
         val_group.setLayout(val_layout)
         settings_panel.addWidget(val_group)
 
-        # 2. PATCH (FIX)
+        # patch 
         patch_group = QGroupBox("Patch (FIX)")
         patch_layout = QVBoxLayout()
         self.fix_pivot = QCheckBox("Fix Pivot & Center World")
@@ -89,7 +88,7 @@ class CheckerWindow(QMainWindow):
 
         settings_panel.addStretch()
 
-        # --- PANEL DROITE ---
+        # panel obj
         results_panel = QVBoxLayout()
         btn_layout = QHBoxLayout()
         self.btn_scan = QPushButton("🔍 SCANNER DOSSIER")
