@@ -3,7 +3,8 @@ import os
 import json
 from PySide6.QtWidgets import (QApplication, QMainWindow, QPushButton, QVBoxLayout, QHBoxLayout,
                                QWidget, QFileDialog, QTreeWidget, QTreeWidgetItem, QLabel,
-                               QProgressBar, QCheckBox, QComboBox, QSpinBox, QGroupBox, QLineEdit)
+                               QProgressBar, QCheckBox, QComboBox, QSpinBox, QDoubleSpinBox, 
+                               QGroupBox, QLineEdit)
 from PySide6.QtCore import Qt
 from checker_logic import UniversalFBXAnaliser
 
@@ -66,6 +67,18 @@ class CheckerWindow(QMainWindow):
         val_group.setLayout(val_layout)
         settings_panel.addWidget(val_group)
 
+        self.check_name = QCheckBox("Check Naming (Prefix)")
+        self.check_name.setChecked(True)
+        self.name_prefix = QLineEdit("SM_") 
+        self.name_prefix.setPlaceholderText("Prefixe (ex: SM_)")
+
+        self.check_uvs = QCheckBox("Check UVs (Missing / Overlap)")
+        self.check_uvs.setChecked(True)
+
+        val_layout.addWidget(self.check_name)
+        val_layout.addWidget(self.name_prefix)
+        val_layout.addWidget(self.check_uvs)
+
         # patch 
         patch_group = QGroupBox("Patch (FIX)")
         patch_layout = QVBoxLayout()
@@ -87,6 +100,33 @@ class CheckerWindow(QMainWindow):
         settings_panel.addWidget(patch_group)
 
         settings_panel.addStretch()
+
+        self.fix_name = QCheckBox("Fix Naming (Add Prefix)")
+        self.fix_name.setChecked(True)
+        
+        self.fix_uvs = QCheckBox("Fix UVs (Auto Unwrap)")
+        self.fix_uvs.setChecked(False)
+
+        patch_layout.addWidget(self.fix_name)
+        patch_layout.addWidget(self.fix_uvs)
+        self.uv_settings_layout = QHBoxLayout()
+        
+        self.uv_angle = QDoubleSpinBox()
+        self.uv_angle.setRange(1, 180)
+        self.uv_angle.setValue(66.0)
+        self.uv_angle.setPrefix("Angle: ")
+        self.uv_angle.setSuffix("°")
+        
+        self.uv_margin = QDoubleSpinBox()
+        self.uv_margin.setRange(0.001, 0.5)
+        self.uv_margin.setSingleStep(0.001)
+        self.uv_margin.setDecimals(3)
+        self.uv_margin.setValue(0.02)
+        self.uv_margin.setPrefix("Marge: ")
+
+        self.uv_settings_layout.addWidget(self.uv_angle)
+        self.uv_settings_layout.addWidget(self.uv_margin)
+        patch_layout.addLayout(self.uv_settings_layout)
 
         # panel obj
         results_panel = QVBoxLayout()
@@ -154,7 +194,20 @@ class CheckerWindow(QMainWindow):
             "fix_pivot": self.fix_pivot.isChecked(),
             "fix_pivot_mode": self.fix_pivot_mode.currentText(),
             "fix_ngon": self.fix_ngon.isChecked(),
-            "fix_double": self.fix_double.isChecked()
+            "fix_double": self.fix_double.isChecked(),
+            "check_name": self.check_name.isChecked(),
+            "name_prefix": self.name_prefix.text(),
+            "check_uvs": self.check_uvs.isChecked(),
+            
+            "fix_pivot": self.fix_pivot.isChecked(),
+            "fix_pivot_mode": self.fix_pivot_mode.currentText(),
+            "fix_ngon": self.fix_ngon.isChecked(),
+            "fix_double": self.fix_double.isChecked(),
+            
+            "fix_name": self.fix_name.isChecked(),
+            "fix_uvs": self.fix_uvs.isChecked(),
+            "fix_uv_angle": self.uv_angle.value(),
+            "fix_uv_margin": self.uv_margin.value()
         }
 
         self.tree.clear()
